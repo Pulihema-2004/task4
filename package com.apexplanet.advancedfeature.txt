@@ -1,0 +1,94 @@
+package com.apexplanet.advancedfeatures
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.*
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            AdvancedFeatureApp()
+        }
+    }
+}
+
+@Composable
+fun AdvancedFeatureApp() {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isAuthenticated by remember { mutableStateOf(false) }
+    var notification by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .padding(24.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Login Screen",
+                style = MaterialTheme.typography.h6
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    isAuthenticated = AuthService.login(email, password)
+                    if (isAuthenticated) {
+                        notification = "Welcome, $email!"
+                        Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                    } else {
+                        notification = "Login Failed. Try again."
+                        Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Login")
+            }
+
+            if (notification.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(notification)
+            }
+        }
+    }
+}
+
+object AuthService {
+    // Simulated login logic (can be tested)
+    fun login(email: String, password: String): Boolean {
+        return email == "intern@apex.com" && password == "1234"
+    }
+}
